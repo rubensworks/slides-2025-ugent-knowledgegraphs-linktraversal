@@ -33,48 +33,551 @@
     </header>
 
     <section id="title" class="slide title" inlist="" rel="schema:hasPart" resource="#title">
-      <h2 property="schema:name">Link Traversal Query Processing</h2>
+      <h2 property="schema:name">Link Traversal<br />Query Processing</h2>
+      <h3>Query execution by following links between documents</h2>
       <ul class="author inline">
           <li class="current"><a href="https://www.rubensworks.net/">Ruben Taelman</a></li>
       </ul>
       <p class="affiliation"><a href="http://idlab.technology/">Ghent University – imec – IDLab, Belgium</a></p>
     </section>
 
-    <section id="start" class="slide" style="background-image: url('img/TODO.jpg')" inlist="" rel="schema:hasPart" resource="#start">
-        <h2 property="schema:name" class="big" style="margin-top: 20px; color: white; text-shadow: 2px 2px black">INTRO</h2>
-        <ul style="color: white; text-shadow: 2px 2px black; font-size: 1.3em">
-            <li>TODO</li>
-        </ul>
+    <section id="query-centralized" class="slide" inlist="" rel="schema:hasPart" resource="#query-centralized">
+        <h2 property="schema:name" style="margin-top: 40px">SPARQL processing over centralized data</h2>
+        <img src="img/sparql-centralized.svg" width="35%" style="float: right" />
+		<ul>
+			<li>
+				<h3>Dataset is collocated with query engine</h3>
+				<span class="indent">All data is known beforehand</span>
+			</li>
+			<li>
+				<h3>Single dataset</h3>
+				<span class="indent">Combining multiple datasets is hard</span>
+			</li>
+		</ul>
+    </section>
+    
+    <section id="query-centralized-problems" class="slide" inlist="" rel="schema:hasPart" resource="#query-centralized-problems">
+        <h2 property="schema:name" style="margin-top: 40px">Centralization not always possible</h2>
+        <img src="img/solid-pods.svg" width="35%" style="float: right" />
+		<ul>
+			<li>
+				<h3>Private data (Solid)</h3>
+				<span class="indent">Technical and legal reasons</span>
+			</li>
+			<li>
+				<h3>Evolving data</h3>
+				<span class="indent">Requires continuous re-indexing</span>
+			</li>
+			<li>
+				<h3>Web scale data</h3>
+				<span class="indent">Indexing the whole Web is infeasible for non-tech-giants</span>
+			</li>
+		</ul>
+    </section>
+    
+    <section id="query-decentralized" class="slide" inlist="" rel="schema:hasPart" resource="#sparql-decentralized">
+        <h2 property="schema:name">How to query over <em>decentralized</em> data?</h2>
+        <center><img src="img/sparql-decentralized.svg" width="75%" /></center>
+		<ul>
+			<li>
+				<h3>Data and query engine are <em>not</em> collocated</h3>
+				<span class="indent">Query engine runs on a separate machine</span>
+			</li>
+			<li>
+				<h3>Not just one datasets</h3>
+				<span class="indent">Data is spread over the Web into multiple <strong>documents</strong></span>
+			</li>
+		</ul>
+    </section>
+    
+    <section id="query-decentralized-overview" class="slide" inlist="" rel="schema:hasPart" resource="#sparql-decentralized-overview">
+        <h2 property="schema:name">Approaches for querying over decentralized data</h2>
+		<ul>
+			<li>
+				<h3>Federated Query Processing</h3>
+				<span class="indent">Distributing query execution across <em>known</em> sources</span>
+			</li>
+			<li>
+				<h3>Link Traversal Query Processing</h3>
+				<span class="indent">Local query execution over sources that are <em>discovered</em> by following links</span>
+			</li>
+		</ul>
     </section>
 	
     <section id="index" class="slide index" inlist="" rel="schema:hasPart" resource="#index">
       <ul>
-        <li><a href="#index-a">TODO</a></li>
-		<li><a href="#index-b">TODO</a></li>
+        <li><a href="#index-federated">Federated Querying</a></li>
+        <li><a href="#index-linktraversal">Link Traversal</a></li>
+        <li><a href="#index-optimizations">Optimizations</a></li>
+		<li><a href="#index-problems">Open problems</a></li>
+      </ul>
+    </section>
+
+    <section id="index-federated" class="slide index" inlist="" rel="schema:hasPart" resource="#index-federated">
+      <ul>
+        <li class="current"><a href="#index-federated">Federated Querying</a></li>
+        <li><a href="#index-linktraversal">Link Traversal</a></li>
+        <li><a href="#index-optimizations">Optimizations</a></li>
+		<li><a href="#index-problems">Open problems</a></li>
       </ul>
     </section>
     
-    <section id="index-a" class="slide index" inlist="" rel="schema:hasPart" resource="#index-a">
-      <ul>
-        <li class="current"><a href="#index-a">TODO</a></li>
-		<li><a href="#index-b">TODO</a></li>
+    <section id="federated-overview" class="slide" inlist="" rel="schema:hasPart" resource="#federated-overview">
+        <h2 property="schema:name">Client distributes query over query APIs</h2>
+        <center><img src="img/sparql-federated.svg" width="75%" /></center>
+		<ul>
+			<li>
+				<h3>Clients do limited effort</h3>
+				<span class="indent">Split up the query, distribute it (source selection), and combine results</span>
+			</li>
+			<li>
+				<h3>Servers perform most of the effort</h3>
+				<span class="indent">They actually execute the queries, over potentially huge datasets</span>
+			</li>
+		</ul>
+    </section>
+    
+    <section id="federated-sparql" class="slide" inlist="" rel="schema:hasPart" resource="#federated-sparql">
+        <h2 property="schema:name">Federation over SPARQL endpoints</h2>
+		<ul>
+			<li>
+				<h3>Servers are SPARQL endpoints (most common)</h3>
+				<span class="indent">They accept any valid SPARQL query</span>
+			</li>
+			<li>
+				<h3>Client-side source selection</h3>
+				<span class="indent">Rewrite query in terms of SERVICE clauses</span>
+			</li>
+		</ul>
+        <div>
+        <pre style="font-size: 0.7em; float: left; margin-right: 15px">SELECT ?drug ?title WHERE {
+  ?drug db:drugCategory dbc:micronutrient.
+  ?drug db:casRegistryNumber ?id.
+  ?keggDrug rdf:type kegg :Drug.
+  ?keggDrug bio2rdf:xRef ?id.
+  ?keggDrug purl:title ?title.
+}
+
+
+</pre>
+        <pre style="font-size: 0.7em">SELECT ?drug ?title WHERE {
+  SERVICE &lt;http://example.com/drb&gt; {
+    ?drug db:drugCategory dbc:micronutrient.
+    ?drug db:casRegistryNumber ?id.
+  }
+  SERVICE &lt;http://example.com/kegg&gt; {
+    ?keggDrug rdf:type kegg :Drug.
+    ?keggDrug bio2rdf:xRef ?id.
+    ?keggDrug purl:title ?title.
+  }
+}</pre>
+    </div>
+    </section>
+    
+    <section id="federated-heterogeneous" class="slide" inlist="" rel="schema:hasPart" resource="#federated-heterogeneous">
+        <h2 property="schema:name">Federation over heterogeneous sources</h2>
+		<ul>
+			<li>
+				<h3>Servers are not only SPARQL endpoints</h3>
+				<span class="indent">Other types of Linked Data Fragments: TPF, WiseKG, brTPF, ...</span><br \>
+                <span class="indent">Different levels of server expressivity</span>
+			</li>
+			<li>
+				<h3>Clients may have to take up more effort</h3>
+				<span class="indent">Executing parts of queries client-side</span>
+			</li>
+			<li>
+				<h3>Trade-off between server and client effort</h3>
+				<span class="indent">Low-cost publishing and preventing server availability issues</span>
+			</li>
+		</ul>
+    </section>
+    
+    <section id="federated-limitations" class="slide" inlist="" rel="schema:hasPart" resource="#federated-limitations">
+        <h2 property="schema:name">Limitations of federated querying</h2>
+		<ul>
+			<li>
+				<h3>All federation members must be known before execution starts</h3>
+				<span class="indent">Source selection distributes query across list of sources</span><br \>
+                <span class="indent">No discovery of <em>new</em> sources</span>
+			</li>
+			<li>
+				<h3>Limited scalability in terms of number of endpoints</h3>
+				<span class="indent">Current federation techniques scale to the order of 10 sources</span>
+			</li>
+		</ul>
+    </section>
+    
+    <section id="index-linktraversal" class="slide index" inlist="" rel="schema:hasPart" resource="#index-linktraversal">
+      <ul>        
+        <li><a href="#index-federated">Federated Querying</a></li>
+        <li class="current"><a href="#index-linktraversal">Link Traversal</a></li>
+        <li><a href="#index-optimizations">Optimizations</a></li>
+		<li><a href="#index-problems">Open problems</a></li>
       </ul>
     </section>
+    
+    <section id="query-decentralized-links" class="slide" inlist="" rel="schema:hasPart" resource="#sparql-decentralized-links">
+        <h2 property="schema:name">Exploit interlinking of documents</h2>
+        <center><img src="img/sparql-decentralized-links.svg" width="75%" /></center>
+		<ul>
+			<li>
+				<h3>Linked Data documents are linked to each other</h3>
+				<span class="indent">Following the Linked Data principles</span>
+			</li>
+			<li>
+				<h3>Query engine can <em>follow</em> links</h3>
+				<span class="indent">Start from one document, and discover new documents on the fly</span>
+			</li>
+		</ul>
+    </section>
+    
+    <section id="link-traversal-concept" class="slide" inlist="" rel="schema:hasPart" resource="#link-traversal-concept" style="text-align: center">
+        <h2 property="schema:name" style="margin-top: 150px">Link Traversal-based Query Processing</h2>
+        <h3>= Querying by following links between documents</h2>
+    </section>
 	
-    <section id="some-slide" class="slide" inlist="" rel="schema:hasPart" resource="#some-slide">
-      <h2 property="schema:name">TODO: A regular slide</h2>
+    <section id="example-decentralized-data" class="slide" inlist="" rel="schema:hasPart" resource="#example-decentralized-data">
+      <h2 property="schema:name">Example: decentralized address book</h2>
+      <center><img src="img/pods.svg" width="75%" /></center>
+    </section>
+    
+    <section id="example-query" class="slide" inlist="" rel="schema:hasPart" resource="#example-query">
+      <h2 property="schema:name">Example: Find Alice's contact names</h2>
+        <img src="img/pods.svg" width="35%" style="float: right" />
+        <pre>SELECT ?name WHERE {
+    &lt;https://alice.pods.org/profile#me&gt;
+        foaf:knows ?person.
+    ?person foaf:name ?name.
+}</pre>
+        <h3>Query process:</h3>
+		<ol>
+			<li>Start from Alice's address book</li>
+            <li>Follow links to profiles of Bob and Carol</li>
+            <li>Query over union of all profiles</li>
+            <li>Find query results: <code>[ { "name": "Bob" }, { "name": "Carol" } ]</code></li>
+		</ol>
+    </section>
+    
+    <section id="link-traversal-process" class="slide" inlist="" rel="schema:hasPart" resource="#link-traversal-process">
+        <h2 property="schema:name">The Link Traversal Query Process</h2>
+        <em><strong>Link queue</strong>: stores links to documents that need to be fetched</em>
+		<ul>
+			<li>
+                <h3>1. Initialize link queue with <em>seed URLs</em></h3>
+                <span class="indent">Seed URLs can be user-defined, or derived from query</span>
+			</li>
+			<li>
+                <h3>2. Iterate and append link queue</h3>
+                <span class="indent">Iteratively pop head off queue, and follow link to document</span><br /><br />
+                <span class="indent">Add all URLs in document to link queue</span>
+			</li>
+			<li>
+                <h3>3. Execute query</h3>
+                <span class="indent">Over union of all discovered RDF triples</span>
+			</li>
+		</ul>
+    </section>
+    
+    <section id="example-link-queue-evolution-1" class="slide" inlist="" rel="schema:hasPart" resource="#example-link-queue-evolution-1">
+        <h2 property="schema:name">Example: Evolution of the Link Queue (1)</h2>
+        <h3>Initialize link queue with seed URL(s)</h3>
+        <table class="link-queue">
+            <tr><td>https://alice.pods.org/profile</td></tr>
+        </table>
+    </section>
+    
+    <section id="example-link-queue-evolution-2" class="slide" inlist="" rel="schema:hasPart" resource="#example-link-queue-evolution-2">
+        <h2 property="schema:name">Example: Evolution of the Link Queue (2)</h2>
+        <h3>Follow link to head of queue</h3>
+        <table class="link-queue">
+            <thead><tr><td>https://alice.pods.org/profile</td></tr></thead>
+        </table>
+    </section>
+    
+    <section id="example-link-queue-evolution-3" class="slide" inlist="" rel="schema:hasPart" resource="#example-link-queue-evolution-3">
+        <h2 property="schema:name">Example: Evolution of the Link Queue (3)</h2>
+        <h3>Push URLs in <code>https://alice.pods.org/profile</code> to queue</h3>
+        <table class="link-queue">
+            <thead><tr><td>https://alice.pods.org/profile</td></tr></thead>
+            <tr><td>https://bob.pods.org/profile</td></tr>
+            <tr><td>https://carol.org/</td></tr>
+        </table>
+        <pre style="border: solid 1px black; padding: 15px;">&lt;/profile#me&gt; :knows
+  &lt;https://bob.pods.org/profile#me&gt;,
+  &lt;https://carol.org/#i&gt;.</pre>
+        <em>No need to re-add link to https://alice.pods.org/profile</em>
+    </section>
+    
+    <section id="example-link-queue-evolution-4" class="slide" inlist="" rel="schema:hasPart" resource="#example-link-queue-evolution-4">
+        <h2 property="schema:name">Example: Evolution of the Link Queue (4)</h2>
+        <h3>Remove handled link from queue</h3>
+        <table class="link-queue">
+            <tr><td>https://bob.pods.org/profile</td></tr>
+            <tr><td>https://carol.org/</td></tr>
+        </table>
+    </section>
+    
+    <section id="example-link-queue-evolution-5" class="slide" inlist="" rel="schema:hasPart" resource="#example-link-queue-evolution-5">
+        <h2 property="schema:name">Example: Evolution of the Link Queue (5)</h2>
+        <h3>Follow link to head of queue</h3>
+        <table class="link-queue">
+            <thead><tr><td>https://bob.pods.org/profile</td></tr></thead>
+            <tr><td>https://carol.org/</td></tr>
+        </table>
+    </section>
+    
+    <section id="example-link-queue-evolution-6" class="slide" inlist="" rel="schema:hasPart" resource="#example-link-queue-evolution-6">
+        <h2 property="schema:name">Example: Evolution of the Link Queue (6)</h2>
+        <h3>No more URLs found in <code>https://bob.pods.org/profile</code></h3>
+        <table class="link-queue">
+            <thead><tr><td>https://bob.pods.org/profile</td></tr></thead>
+            <tr><td>https://carol.org/</td></tr>
+        </table>
+        <pre style="border: solid 1px black; padding: 15px;">&lt;/profile#me&gt; :name "Bob";
+  :email &lt;mailto:bob@mail.org&gt;;
+  :telephone "0499 12 34 56".</pre>
+        <em>mailto:bob@mail.org is not an HTTP(S) link that can be followed</em>
+    </section>
+    
+    <section id="example-link-queue-evolution-7" class="slide" inlist="" rel="schema:hasPart" resource="#example-link-queue-evolution-7">
+        <h2 property="schema:name">Example: Evolution of the Link Queue (7)</h2>
+        <h3>Remove handled link from queue</h3>
+        <table class="link-queue">
+            <tr><td>https://carol.org/</td></tr>
+        </table>
+    </section>
+    
+    <section id="example-link-queue-evolution-8" class="slide" inlist="" rel="schema:hasPart" resource="#example-link-queue-evolution-8">
+        <h2 property="schema:name">Example: Evolution of the Link Queue (8)</h2>
+        <h3>Follow link to head of queue</h3>
+        <table class="link-queue">
+            <thead><tr><td>https://carol.org/</td></tr></thead>
+        </table>
+    </section>
+    
+    <section id="example-link-queue-evolution-9" class="slide" inlist="" rel="schema:hasPart" resource="#example-link-queue-evolution-9">
+        <h2 property="schema:name">Example: Evolution of the Link Queue (9)</h2>
+        <h3>No more URLs found in <code>https://carol.org/</code></h3>
+        <table class="link-queue">
+            <thead><tr><td>https://carol.org/</td></tr></thead>
+        </table>
+        <pre style="border: solid 1px black; padding: 15px;">&lt;/#i&gt; :name "Carol";
+  :email &lt;mailto:i@carol.org&gt;;
+  :telephone "0499 11 22 33".</pre>
+    </section>
+    
+    <section id="example-link-queue-evolution-10" class="slide" inlist="" rel="schema:hasPart" resource="#example-link-queue-evolution-10">
+        <h2 property="schema:name">Example: Evolution of the Link Queue (10)</h2>
+        <h3>Remove handled link from queue</h3>
+        <em>Link queue is empty</em>
+        <h3 class="next">Execute query over union of all discovered RDF triples<h3>
+    </section>
+    
+    <section id="index-optimizations" class="slide index" inlist="" rel="schema:hasPart" resource="#index-optimizations">
       <ul>
-          <li>
-          	  <h3>A</h3>
-			  <span class="indent">TODO: Description</span>
-          </li>
-          <li>B</li>
-          <li>C</li>
+        <li><a href="#index-federated">Federated Querying</a></li>
+        <li><a href="#index-linktraversal">Link Traversal</a></li>
+        <li class="current"><a href="#index-optimizations">Optimizations</a></li>
+		<li><a href="#index-problems">Open problems</a></li>
+      </ul>
+    </section>
+    
+    <section id="optimizations" class="slide" inlist="" rel="schema:hasPart" resource="#optimizations">
+        <h2 property="schema:name">Link Traversal has practical problems</h2>
+        <em>But solutions exist!</em>
+		<ul>
+			<li>
+                <h3>Link queue rarely becomes empty</h3>
+                <span class="indent">It grows in size due to massive size of the Web</span><br /><br />
+                <span class="indent">Query process never has a chance to start!</span>
+			</li>
+			<li>
+                <h3>Too many links are followed</h3>
+                <span class="indent">Each document typically contains many links &rarr; exponential growth</span>
+			</li>
+			<li>
+                <h3>Existing query planning algorithms don't work</h3>
+                <span class="indent">There is no a priori knowledge about cardinalities and other statistics</span>
+			</li>
+		</ul>
+    </section>
+    
+    <section id="iterator-pipeline" class="slide" inlist="" rel="schema:hasPart" resource="#iterator-pipeline">
+        <h2 property="schema:name">Process query during link queue handling</h2>
+        <img src="img/pipeline.svg" width="33%" style="float: right" />
+        <h3>&rarr; Cope with infinitely growing link queues</h3>
+		<ul>
+			<li>
+                <h3>Extension of <em>pipelining</em> approach</h3>
+                <span class="indent">Link queue is a component in pipeline</span><br /><br />
+                <span class="indent">May produce an infinite data stream</span>
+			</li>
+		</ul>
+    </section>
+    
+    <section id="reachability" class="slide" inlist="" rel="schema:hasPart" resource="#reachability" style="font-size: 0.95em">
+        <h2 property="schema:name">Pre-filter links before they enter queue</h2>
+        <h3>&rarr; Cope with large number of links</h3>
+        <em>Different filtering strategies exist</em>
+		<ul>
+			<li>
+                <h3>Follow all</h3>
+                <span class="indent">No filtering, follow all possible links</span>
+			</li>
+			<li>
+                <h3>Follow none</h3>
+                <span class="indent">Follow no links</span>
+			</li>
+			<li>
+                <h3>Follow if triple matches query</h3>
+                <span class="indent">Follow links in a triple if they match at least one triple pattern in the query</span>
+			</li>
+		</ul>
+    </section>
+    
+    <section id="reachability-cmatch" class="slide" inlist="" rel="schema:hasPart" resource="#reachability-cmatch">
+        <h2 property="schema:name">Follow if triple matches query: example</h2>
+        <pre>SELECT ?name WHERE {
+    &lt;https://alice.pods.org/profile#me&gt; foaf:knows ?person.
+    ?person foaf:name ?name.
+}</pre>
+        <br />
+        Contents of <code>https://alice.pods.org/profile</code>:
+        <pre style="border: solid 1px black; padding: 15px; font-size: 0.9em">✅ &lt;/profile#me&gt; :knows &lt;https://bob.pods.org/profile#me&gt;.
+✅ &lt;/profile#me&gt; :knows &lt;https://carol.org/#i&gt;.
+❌ &lt;/profile#me&gt; :likes &lt;https://bob.pods.org/posts/hello-world&gt;.</pre>
+    </section>
+    
+    <section id="reachability-semantics" class="slide" inlist="" rel="schema:hasPart" resource="#reachability-semantics">
+        <h2 property="schema:name">Filtering links and query semantics</h2>
+		<ul>
+			<li>
+                <h3>SPARQL queries have universal meaning</h3>
+                <span class="indent">Queries can be executed over all (RDF) datasets</span>
+			</li>
+			<li>
+                <h3>Query results depend on datasets</h3>
+                <span class="indent">Executing same query over different datasets may produce different results</span>
+			</li>
+			<li>
+                <h3>Different link filtering strategies leads to different range of documents</h3>
+                <span class="indent">Query results may differ for different strategies</span><br /><br />
+                <span class="indent">Results also depend on the seed URLs</span>
+			</li>
+		</ul>
+    </section>
+    
+    <section id="query-planning" class="slide" inlist="" rel="schema:hasPart" resource="#query-planning" style="font-size: 0.9em">
+        <h2 property="schema:name">Zero-knowledge query planning</h2>
+        <h3>&rarr; Cope with existing query planning algorithms not working</h3>
+        <h3>Score-based heuristics for determining triple pattern order in BGPs</h3>
+		<ul>
+			<li>
+                <h3>Selectivity</h3>
+                <span class="indent">Triple patterns with fewer variables are prioritized</span>
+			</li>
+			<li>
+                <h3>Seed-based</h3>
+                <span class="indent">Triple patterns that contain a seed URL are prioritized</span>
+			</li>
+			<li>
+                <h3>No ontologies</h3>
+                <span class="indent">Triple patterns for well-known ontologies (e.g. <code>rdf:type</code>) are deprioritized</span><br />
+                <span class="indent">These often produce <em>many</em> results</span>
+			</li>
+		</ul>
+    </section>
+    
+    <section id="index-problems" class="slide index" inlist="" rel="schema:hasPart" resource="#index-problems">
+      <ul>        
+        <li><a href="#index-federated">Federated Querying</a></li>
+        <li><a href="#index-linktraversal">Link Traversal</a></li>
+        <li><a href="#index-optimizations">Optimizations</a></li>
+		<li class="current"><a href="#index-problems">Open problems</a></li>
+      </ul>
+    </section>
+    
+    <section id="problem-slow" class="slide" inlist="" rel="schema:hasPart" resource="#problem-slow">
+        <h2 property="schema:name">Slow query execution</h2>
+		<ul>
+			<li>
+                <h3>Large number of links to follow</h3>
+                <span class="indent">Fetching all documents on the Web is not practical</span>
+			</li>
+			<li>
+                <h3>Following links is expensive</h3>
+                <span class="indent">Setting up many TCP connections for doing HTTP requests takes time</span>
+			</li>
+			<li>
+                <h3>No indexing</h3>
+                <span class="indent">Query planning is based on heuristics</span>
+			</li>
+		</ul>
+    </section>
+    
+    <section id="problem-termination" class="slide" inlist="" rel="schema:hasPart" resource="#problem-termination">
+        <h2 property="schema:name">Query never terminates</h2>
+		<ul>
+			<li>
+                <h3>Large number of links to follow</h3>
+                <span class="indent">New content is produced faster than you can follow links</span>
+			</li>
+			<li>
+                <h3>Attempts to solve this by prioritizing links in queue</h3>
+                <span class="indent">For example, depth-first search, breadth-first search, page rank, ...</span><br />
+                <span class="indent">Only reduces time to first result, not total execution time</span>
+			</li>
+			<li>
+                <h3>Better solutions are needed</h3>
+                <span class="indent">Data publishers could point to query-relevant documents</span>
+			</li>
+		</ul>
+    </section>
+    
+    <section id="problem-security" class="slide" inlist="" rel="schema:hasPart" resource="#problem-security">
+        <h2 property="schema:name">Potential security issues</h2>
+		<ul>
+			<li>
+                <h3>People can make unauthoritative statements</h3>
+                <span class="indent">Web is open &rarr; anyone can say anything</span><br /><br />
+                <span class="indent">Example: Carol gives a faulty name to Bob.</span>
+			</li>
+			<li>
+                <h3>System hogging</h3>
+                <span class="indent">Malicious publishers could link to documents that are expensive to process</span><br /><br />
+                <span class="indent">Example: huge files, documents with syntax errors, ...</span>
+			</li>
+		</ul>
+    </section>
+    
+    <section id="index-final" class="slide index" inlist="" rel="schema:hasPart" resource="#index-final">
+      <ul>
+        <li><a href="#index-federated">Federated Querying</a></li>
+        <li><a href="#index-linktraversal">Query process</a></li>
+        <li><a href="#index-optimizations">Optimizations</a></li>
+		<li><a href="#index-problems">Open problems</a></li>
       </ul>
     </section>
 	
     <section id="conclusion" class="slide" inlist="" rel="schema:hasPart" resource="#conclusion">
-      <h2 property="schema:name" class="big">TODO: Conclusion</h2>
+      <h2 property="schema:name">Conclusions</h2>
+	<ul>
+		<li>
+              <h3>Link Traversal is suitable for querying decentralized environments</h3>
+              <span class="indent">Copes with limitations of federated querying</span><br />
+              <span class="indent">Relatively new research area &rarr; many open problems</span>
+		</li>
+		<li>
+              <h3>Main bottleneck is number of links</h3>
+              <span class="indent">Future research should focus on guidance towards query-relevant links</span>
+		</li>
+		<li>
+              <h3>You can become a pioneer in this domain!</h3>
+              <span class="indent">IDLab is doing research on Link Traversal</span><br />
+              <span class="indent">We offer student jobs, master theses, PhD jobs</span>
+		</li>
+	</ul>
     </section>
 
     <footer>
