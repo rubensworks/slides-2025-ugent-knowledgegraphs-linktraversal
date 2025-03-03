@@ -16,6 +16,16 @@
       .shower {
         --slide-ratio: calc(16 / 9);
       }
+      table.link-queue thead tr {
+          border: solid 1px gray;
+      }
+      table.link-queue thead td {
+          font-weight: bold;
+          background-color: white;
+      }
+      table.link-queue tbody tr {
+          border: solid 1px gray;
+      }
     </style>
   </head>
 
@@ -531,22 +541,6 @@
 			<li>
                 <h3>Better solutions are needed</h3>
                 <span class="indent">Data publishers could point to query-relevant documents</span>
-			</li>
-		</ul>
-    </section>
-    
-    <section id="problem-security" class="slide" inlist="" rel="schema:hasPart" resource="#problem-security">
-        <h2 property="schema:name">Potential security issues</h2>
-		<ul>
-			<li>
-                <h3>People can make unauthoritative statements</h3>
-                <span class="indent">Web is open &rarr; anyone can say anything</span><br /><br />
-                <span class="indent">Example: Carol gives a faulty name to Bob.</span>
-			</li>
-			<li>
-                <h3>System hogging</h3>
-                <span class="indent">Malicious publishers could link to documents that are expensive to process</span><br /><br />
-                <span class="indent">Example: huge files, documents with syntax errors, ...</span>
 			</li>
 		</ul>
     </section>
